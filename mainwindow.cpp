@@ -132,7 +132,7 @@ bool MainWindow::CheckCorrect(Ui::MainWindow *ui)
     // Цикл проверки всех элементов
     for (int i = 0; i < rCount; i++)
     {
-        QTableWidgetItem *itm = ui->tableWidget_ist->item(i, (clmn - 1));
+        QTableWidgetItem *itm = ui->tableWidget_ist->item(i, (clmn - 1));    // -1, индексация с 0
         if (itm == nullptr)  // если ячейка пустая
         {
             QMessageBox::warning(this, "Error", "Invalid numbers in table");
@@ -147,6 +147,7 @@ bool MainWindow::CheckCorrect(Ui::MainWindow *ui)
     return true;  // успех
 }
 
+// Сохраняет 0, сохраняет 1
 void MainWindow::on_pushButton_save01_clicked()
 {
     if ( CheckCorrect(ui) )  // проверка таблицы истинности
@@ -173,6 +174,94 @@ void MainWindow::on_pushButton_save01_clicked()
         ui->label_res->setText(result); // вывод
     }
 }
+
+// Самодвойственная?
+void MainWindow::on_pushButton_samo_clicked()
+{
+    if ( CheckCorrect(ui) )  // проверка таблицы истинности
+    {
+        ui->tableWidget_ist->insertColumn(ui->tableWidget_ist->columnCount());
+        ui->tableWidget_ist->setHorizontalHeaderItem(ui->tableWidget_ist->columnCount()-1, new QTableWidgetItem("F'"));
+
+        QString origin = "";
+        QString dual ="";
+
+        int rowC = ui->tableWidget_ist->rowCount();
+        int columnC = ui->tableWidget_ist->columnCount();
+
+        for (int i = 0; i < rowC; i++)
+        {
+            QTableWidgetItem *itm = ui->tableWidget_ist->item(i, (columnC - 2) );
+            if (itm->text() == "1")
+            {
+                origin.append(itm->text());
+                QTableWidgetItem *zer0 = new QTableWidgetItem (QObject::tr("%1").arg(0));
+                ui->tableWidget_ist->setItem(i, columnC-1, zer0);
+            }
+            else if (itm->text() == "0")
+            {
+                origin.append(itm->text());
+                QTableWidgetItem *one1 = new QTableWidgetItem (QObject::tr("%1").arg(1));
+                ui->tableWidget_ist->setItem(i, columnC-1, one1);
+            }
+        }
+
+        ui->tableWidget_ist->insertColumn(ui->tableWidget_ist->columnCount());
+        ui->tableWidget_ist->setHorizontalHeaderItem(ui->tableWidget_ist->columnCount()-1, new QTableWidgetItem("F*"));
+        columnC = ui->tableWidget_ist->columnCount();
+
+        for (int i = 0; i < rowC; i++)
+        {
+            QTableWidgetItem *item = ui->tableWidget_ist->item(i, (columnC - 2) );
+            if (item->text() == "1")
+            {
+                dual.insert(0, item->text());
+                QTableWidgetItem *one = new QTableWidgetItem (QObject::tr("%1").arg(1));
+                ui->tableWidget_ist->setItem( (rowC - (i + 1)), columnC-1, one);
+            }
+            else if (item->text() == "0")
+            {
+                dual.insert(0, item->text());
+                QTableWidgetItem *zero = new QTableWidgetItem (QObject::tr("%1").arg(0));
+                ui->tableWidget_ist->setItem( (rowC - (i + 1)), columnC-1, zero);
+            }
+        }
+
+        if (origin.compare(dual) == 0)
+        {
+            ui->label_res->setText("Resul:  is self-dual");
+        }
+        else
+        {
+            ui->label_res->setText("Resul:  is not self-dual");
+        }
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
