@@ -180,21 +180,24 @@ void MainWindow::on_pushButton_samo_clicked()
 {
     if ( CheckCorrect(ui) )  // проверка таблицы истинности
     {
-        ui->tableWidget_ist->insertColumn(ui->tableWidget_ist->columnCount());
+        ui->tableWidget_ist->insertColumn(ui->tableWidget_ist->columnCount()); // вставляем колонку для НЕ
         ui->tableWidget_ist->setHorizontalHeaderItem(ui->tableWidget_ist->columnCount()-1, new QTableWidgetItem("F'"));
 
+        // Строки исходной ф-ции и двойственной
         QString origin = "";
         QString dual ="";
 
-        int rowC = ui->tableWidget_ist->rowCount();
-        int columnC = ui->tableWidget_ist->columnCount();
+        int rowC = ui->tableWidget_ist->rowCount();         // кол-во рядков
+        int columnC = ui->tableWidget_ist->columnCount();   // кол-во колонок
 
+        // Цикл прохода по всем рядкам
         for (int i = 0; i < rowC; i++)
         {
-            QTableWidgetItem *itm = ui->tableWidget_ist->item(i, (columnC - 2) );
+            QTableWidgetItem *itm = ui->tableWidget_ist->item(i, (columnC - 2) );  // обращаемся к колонке с ф-цией
+            // Помещаем в новую колонку результат отрицания
             if (itm->text() == "1")
             {
-                origin.append(itm->text());
+                origin.append(itm->text()); // запис?ваем вектор ф-ции
                 QTableWidgetItem *zer0 = new QTableWidgetItem (QObject::tr("%1").arg(0));
                 ui->tableWidget_ist->setItem(i, columnC-1, zer0);
             }
@@ -206,10 +209,11 @@ void MainWindow::on_pushButton_samo_clicked()
             }
         }
 
-        ui->tableWidget_ist->insertColumn(ui->tableWidget_ist->columnCount());
+        ui->tableWidget_ist->insertColumn(ui->tableWidget_ist->columnCount());      // вставляем колонку для двойственности
         ui->tableWidget_ist->setHorizontalHeaderItem(ui->tableWidget_ist->columnCount()-1, new QTableWidgetItem("F*"));
         columnC = ui->tableWidget_ist->columnCount();
 
+        // Цикл прохода по всем рядкам
         for (int i = 0; i < rowC; i++)
         {
             QTableWidgetItem *item = ui->tableWidget_ist->item(i, (columnC - 2) );
@@ -217,7 +221,7 @@ void MainWindow::on_pushButton_samo_clicked()
             {
                 dual.insert(0, item->text());
                 QTableWidgetItem *one = new QTableWidgetItem (QObject::tr("%1").arg(1));
-                ui->tableWidget_ist->setItem( (rowC - (i + 1)), columnC-1, one);
+                ui->tableWidget_ist->setItem( (rowC - (i + 1)), columnC-1, one);            // запис?ваем колонку с отрицание в новую колонку в обратном порядке
             }
             else if (item->text() == "0")
             {
@@ -227,9 +231,10 @@ void MainWindow::on_pushButton_samo_clicked()
             }
         }
 
+        // Сравниваем ф-цию и двойственную ей.
         if (origin.compare(dual) == 0)
         {
-            ui->label_res->setText("Resul:  is self-dual");
+            ui->label_res->setText("Resul:  is self-dual");  // Если равны - ф-ция самодвойственна
         }
         else
         {
