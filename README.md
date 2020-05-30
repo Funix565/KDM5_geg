@@ -1,1 +1,3 @@
 # KDM5
+# PLEASE, POSTAV' KODIROVKU IBM866/CP866/csIDM866
+# i ne ruin' kommenti, PLEASE
