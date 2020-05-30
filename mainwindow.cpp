@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <cmath>
+#include <QMessageBox>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -112,6 +114,64 @@ void MainWindow::ChosenRadio()
     *
     *
     * РАСПИШИ ТАМ, КАК НАДО. ЭТО КОД С ЛАБЫ ПО КАЛЬКУЛЯТОРУ */
+}
+
+// Проверка таблицы
+bool MainWindow::CheckCorrect(Ui::MainWindow *ui)
+{
+    // Если не выбрано кол-во переменных и таблица не создана
+    if (ui->radioButton_2vars->isChecked() == false && ui->radioButton_3vars->isChecked() == false && ui->radioButton_4vars->isChecked() == false)
+    {
+        QMessageBox::warning(this, "Error", "Choose amount of vars");
+        return false;
+    }
+
+    int rCount = ui->tableWidget_ist->rowCount();
+    int clmn = ui->tableWidget_ist->columnCount();
+
+    // Цикл проверки всех элементов
+    for (int i = 0; i < rCount; i++)
+    {
+        QTableWidgetItem *itm = ui->tableWidget_ist->item(i, (clmn - 1));
+        if (itm == nullptr)  // если ячейка пустая
+        {
+            QMessageBox::warning(this, "Error", "Invalid numbers in table");
+            return false;
+        }
+        if (itm->text() != "1" && itm->text() != "0") // если ячейка не ноль и не один
+        {
+            QMessageBox::warning(this, "Error", "Invalid numbers in table");
+            return false;
+        }
+    }
+    return true;  // успех
+}
+
+void MainWindow::on_pushButton_save01_clicked()
+{
+    if ( CheckCorrect(ui) )  // проверка таблицы истинности
+    {
+        int clmn = ui->tableWidget_ist->columnCount() - 1;  // последняя колонка
+        int row = ui->tableWidget_ist->rowCount() - 1;      // последний рядок
+
+        QTableWidgetItem *zer0 = ui->tableWidget_ist->item(0, clmn);    // (0, 0, ..., 0)
+        QTableWidgetItem *one1 = ui->tableWidget_ist->item(row, clmn);  // (1, 1, ..., 1)
+
+        QString result = "Result: The function is  ";
+        if (zer0->text() == "0")
+        {
+            result.append("0-preserving  ");    // сохраняет 0
+        }
+        if (one1->text() == "1")
+        {
+            result.append("1-preserving");      // сохраняет 1
+        }
+        if (zer0->text() != "0" && one1->text() != "1")         // Другое условие, это иф тупой
+        {
+            result.append("not 0-preserving or 1-preserving");  // ничего не сохраняет
+        }
+        ui->label_res->setText(result); // вывод
+    }
 }
 
 

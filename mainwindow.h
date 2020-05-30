@@ -13,6 +13,9 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
+
+    bool CheckCorrect(Ui::MainWindow *ui);
+
     ~MainWindow();
 
 private:
@@ -20,6 +23,7 @@ private:
 
 private slots:
     void ChosenRadio();
+    void on_pushButton_save01_clicked();
 };
 
 #endif // MAINWINDOW_H
