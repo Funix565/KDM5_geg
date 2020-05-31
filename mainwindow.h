@@ -25,6 +25,7 @@ private slots:
     void ChosenRadio();
     void on_pushButton_save01_clicked();
     void on_pushButton_samo_clicked();
+    void on_pushButton_SOP_clicked();
 };
 
 #endif // MAINWINDOW_H

@@ -221,7 +221,7 @@ void MainWindow::on_pushButton_samo_clicked()
             {
                 dual.insert(0, item->text());
                 QTableWidgetItem *one = new QTableWidgetItem (QObject::tr("%1").arg(1));
-                ui->tableWidget_ist->setItem( (rowC - (i + 1)), columnC-1, one);            // запис?ваем колонку с отрицание в новую колонку в обратном порядке
+                ui->tableWidget_ist->setItem( (rowC - (i + 1)), columnC-1, one);            // записiваем колонку с отрицание в новую колонку в обратном порядке
             }
             else if (item->text() == "0")
             {
@@ -241,47 +241,83 @@ void MainWindow::on_pushButton_samo_clicked()
             ui->label_res->setText("Resul:  is not self-dual");
         }
     }
-
-
 }
 
+// ДДНФ
+void MainWindow::on_pushButton_SOP_clicked()
+{
+    if ( CheckCorrect(ui) ) // проверка
+    {
+        int rows = ui->tableWidget_ist->rowCount();         // рядки
+        int clmn = ui->tableWidget_ist->columnCount() - 1;  // колонки, берем с индекса (ф-ция - 1)
 
+        QString SOP = "Result:  ";  // строка результат
 
+        // Цикл проходя по рядкам ТИ
+        for (int i = 0; i < rows; i++)
+        {
+            QString for_anal = "";  // для интерпретаций
+            QTableWidgetItem *dnf = ui->tableWidget_ist->item(i, clmn );    // берем єлемент из последней колокни
+            if (dnf->text() == "1") // Если единица
+            {
+                // Цикл для запис?вания интерпретаций
+                for (int k = 0; k < clmn; k++)
+                {
+                    QTableWidgetItem *interp = ui->tableWidget_ist->item(i, k);
+                    for_anal.append(interp->text());
+                }
 
+                // Выглядит ооооочень тупо. Но пока в голову ничего не приходит.
+                // Как посмотреть всю интерпретацию и каждое число. Каждое число имеет два варианта. И в ответ разную букву помещать.
+                // Слабая универсальность прослеживается
 
+                // Условия анализа интерпретации и формирования результата
+                if (for_anal[0] == "1") // первая
+                {
+                    SOP.append("X");
+                }
+                else if (for_anal[0] == "0")
+                {
+                    SOP.append("X'");
+                }
 
+                if (for_anal[1] == "1") // вторая
+                {
+                    SOP.append("Y");
+                }
+                else if (for_anal[1] == "0")
+                {
+                    SOP.append("Y'");
+                }
 
+                if (rows > 2)
+                {
+                    if (for_anal[2] == "1") // третья
+                    {
+                        SOP.append("Z");
+                    }
+                    else if (for_anal[2] == "0")
+                    {
+                        SOP.append("Z'");
+                    }
+                }
+                if (rows > 3)           // четвертая
+                {
+                    if (for_anal[3] == "1")
+                    {
+                        SOP.append("T");
+                    }
+                    else if (for_anal[3] == "0")
+                    {
+                        SOP.append("T'");
+                    }
+                }
+                SOP.append(" || "); // дизюнкция конюнкций
+            }
+        }
 
+        SOP.remove( (SOP.length() - 4), 4 );    // удаляем последний символ операции
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        ui->label_res->setText(SOP);        // вывод
+    }
+}
