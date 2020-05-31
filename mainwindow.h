@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <vector>
 
 namespace Ui {
 class MainWindow;
@@ -15,6 +16,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
 
     bool CheckCorrect(Ui::MainWindow *ui);
+    std::vector<int> Calc_mod2 (std::vector <int> line);
 
     ~MainWindow();
 
@@ -26,6 +28,7 @@ private slots:
     void on_pushButton_save01_clicked();
     void on_pushButton_samo_clicked();
     void on_pushButton_SOP_clicked();
+    void on_pushButton_Polinom_clicked();
 };
 
 #endif // MAINWINDOW_H

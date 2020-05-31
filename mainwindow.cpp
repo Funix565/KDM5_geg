@@ -2,7 +2,10 @@
 #include "ui_mainwindow.h"
 #include <cmath>
 #include <QMessageBox>
+#include <vector>
 #include <QDebug>
+
+bool b_SELFd = false;   // УБРАТЬ КОЛОНКИ ПОСЛЕ САМОДВОЙСТВЕННОСТИ
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -44,7 +47,7 @@ void MainWindow::ChosenRadio()
     }
 
     ui->tableWidget_ist->setRowCount( pow(2.0, varCnt) );   // кол-во строк
-    ui->tableWidget_ist->setColumnCount(varCnt + 1);        // кол- во столбцов   // TODO: insert FOR self-dual; then remove FOR self-dual
+    ui->tableWidget_ist->setColumnCount(varCnt + 1);        // кол- во столбцов
 
     char str_vars[4] = {'X', 'Y', 'Z', 'T'};                // массив имен переменных
     QStringList headersClmn;
@@ -144,6 +147,15 @@ bool MainWindow::CheckCorrect(Ui::MainWindow *ui)
             return false;
         }
     }
+
+    // УДАЛЕНИЕ КОЛОНОК ПОСЛЕ САМОДВОЙСТВЕННОСТИ
+//    if (b_SELFd == true)
+//    {
+//        b_SELFd = false;
+//        ui->tableWidget_ist->removeColumn(ui->tableWidget_ist->columnCount()-1);
+//        ui->tableWidget_ist->removeColumn(ui->tableWidget_ist->columnCount()-1);
+//    }
+
     return true;  // успех
 }
 
@@ -221,7 +233,7 @@ void MainWindow::on_pushButton_samo_clicked()
             {
                 dual.insert(0, item->text());
                 QTableWidgetItem *one = new QTableWidgetItem (QObject::tr("%1").arg(1));
-                ui->tableWidget_ist->setItem( (rowC - (i + 1)), columnC-1, one);            // записiваем колонку с отрицание в новую колонку в обратном порядке
+                ui->tableWidget_ist->setItem( (rowC - (i + 1)), columnC-1, one);            // записываем колонку с отрицание в новую колонку в обратном порядке
             }
             else if (item->text() == "0")
             {
@@ -240,6 +252,8 @@ void MainWindow::on_pushButton_samo_clicked()
         {
             ui->label_res->setText("Resul:  is not self-dual");
         }
+
+        b_SELFd = true;
     }
 }
 
@@ -253,14 +267,14 @@ void MainWindow::on_pushButton_SOP_clicked()
 
         QString SOP = "Result:  ";  // строка результат
 
-        // Цикл проходя по рядкам ТИ
+        // Цикл прохода по рядкам ТИ
         for (int i = 0; i < rows; i++)
         {
             QString for_anal = "";  // для интерпретаций
             QTableWidgetItem *dnf = ui->tableWidget_ist->item(i, clmn );    // берем єлемент из последней колокни
             if (dnf->text() == "1") // Если единица
             {
-                // Цикл для запис?вания интерпретаций
+                // Цикл для записывания интерпретаций
                 for (int k = 0; k < clmn; k++)
                 {
                     QTableWidgetItem *interp = ui->tableWidget_ist->item(i, k);
@@ -268,6 +282,7 @@ void MainWindow::on_pushButton_SOP_clicked()
                 }
 
                 // Выглядит ооооочень тупо. Но пока в голову ничего не приходит.
+                //****************************************************************ПРИШЛО: МОЖНО БРАТЬ ПЕРЕМЕННЫЕ КАК В ЖЕГАЛКИНЕ****************************************
                 // Как посмотреть всю интерпретацию и каждое число. Каждое число имеет два варианта. И в ответ разную букву помещать.
                 // Слабая универсальность прослеживается
 
@@ -320,4 +335,98 @@ void MainWindow::on_pushButton_SOP_clicked()
 
         ui->label_res->setText(SOP);        // вывод
     }
+}
+
+// ДКНФ
+
+
+// Жегалкин
+void MainWindow::on_pushButton_Polinom_clicked()
+{
+    if ( CheckCorrect(ui) ) // проверка
+    {
+        int rows = ui->tableWidget_ist->rowCount();         // получаем рядки
+        int clmn = ui->tableWidget_ist->columnCount() - 1;  // колонки
+
+        std::vector<int> line_triag1;       // вектор для сложений по модулю
+        std::vector<int> final_line;        // финальный вектор с "левой" стороной треугольника
+
+        // Цикл прохода по ТИ и формирование вектора ф-ции
+        for (int i = 0; i < rows; i++)
+        {
+            QTableWidgetItem *triag = ui->tableWidget_ist->item(i, clmn);
+            bool ok;
+            int el = triag->text().toInt(&ok, 10);
+            line_triag1.push_back(el);
+            if (i == 0)
+            {
+                final_line.push_back(el);
+            }
+        }
+
+        // Цикл для сложения по модулю для каждого элемента вектора
+        // Пока в векторе находится больше одного элемента
+        while (line_triag1.size() != 1)
+        {
+            line_triag1 = Calc_mod2(line_triag1);   // передаем текущий вектор и получаем новый
+            final_line.push_back(line_triag1[0]);
+        }
+
+        // Формирование результата
+        QString res = "Zhegalkin polynomial:  ";    // Строка
+        bool con_zero = true;                       // Переменная для определения константы нуля
+
+        // Цикл прохода по вектору-результату.
+        // Начинаем с нулевого, пока не пройдем весь
+        for (int k = 0; k < final_line.size(); k++)
+        {
+            // Если в векторе единица
+            if (final_line[k] == 1)
+            {
+                int row = k;    // Запоминаем индекс в векторе - это рядок в ТИ
+                if (row == 0)
+                {
+                    res.append("1 \u2295 ");        // для (0, 0, ..., 0) - значение 1
+                    continue;
+                }
+                // Цикл для прохода всех чисел интерпретации
+                // С нулевой до последней колонки
+                for (int clmn = 0; clmn < ui->tableWidget_ist->columnCount()-1; clmn++)
+                {
+                    QTableWidgetItem *geg = ui->tableWidget_ist->item(row, clmn);
+                    if (geg->text() == "1")     // если нашли единицу
+                    {
+                        // Получаем имя переменной
+                        QTableWidgetItem *var_h = ui->tableWidget_ist->horizontalHeaderItem(clmn);
+                        res.append(var_h->text());  // Заносим в строку-результат
+                        con_zero = false;       // уже не константа
+                    }
+                }
+                res.append(QString::fromUtf8(" \u2295 "));  // символ mod2
+            }
+        }
+
+        if (con_zero)  // если в результат ничего не было записано
+        {
+            ui->label_res->setText("Constant of 0. Polynomial is zero");  // Полином - ноль
+            return; // выход
+        }
+
+        res.remove( (res.length() - 3), 3);  // удаляем последний символ операции
+        ui->label_res->setText(res);         // вывод
+    }
+}
+
+// Ф-ция сложения по модулю 2
+// Принимает вектор.
+// Возвращает вектор из сум по модулю между текущим и следующим элементами
+std::vector<int> MainWindow::Calc_mod2(std::vector<int> line)
+{
+    std::vector<int> for_ret;
+    for (int i = 0; i < line.size() - 1; i++)
+    {
+        int num = line[i] ^ line[i+1];      // ^ битовая операция, сложение по модулю (исключающие ИЛИ XOR)
+        for_ret.push_back(num);             // записываем в конец вектора
+    }
+    return for_ret;     // возвращаем
 }
