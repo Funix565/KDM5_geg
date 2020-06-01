@@ -5,7 +5,7 @@
 #include <vector>
 #include <QDebug>
 
-bool b_SELFd = false;   // “€’œ ŠŽ‹ŽŠˆ Ž‘‹… ‘€ŒŽ„‚Ž‰‘’‚…Ž‘’ˆ
+bool b_SELFd = false;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -26,6 +26,14 @@ MainWindow::~MainWindow()
 // ”-æ¨ï ¯®áâà®¥­¨¥ â ¡«¨æë
 void MainWindow::ChosenRadio()
 {
+    // “„€‹…ˆ… ŠŽ‹ŽŽŠ Ž‘‹… ‘€ŒŽ„‚Ž‰‘’‚…Ž‘’ˆ
+    if (b_SELFd == true)
+    {
+        b_SELFd = false;
+        ui->tableWidget_ist->removeColumn(ui->tableWidget_ist->columnCount()-1);
+        ui->tableWidget_ist->removeColumn(ui->tableWidget_ist->columnCount()-1);
+    }
+
     ui->tableWidget_ist->clear();
 
     QRadioButton *rb = (QRadioButton *)sender();    // á¨£­ « ®â ª­®¯ª¨
@@ -122,6 +130,14 @@ void MainWindow::ChosenRadio()
 // à®¢¥àª  â ¡«¨æë
 bool MainWindow::CheckCorrect(Ui::MainWindow *ui)
 {
+    // “„€‹…ˆ… ŠŽ‹ŽŽŠ Ž‘‹… ‘€ŒŽ„‚Ž‰‘’‚…Ž‘’ˆ
+    if (b_SELFd == true)
+    {
+        b_SELFd = false;
+        ui->tableWidget_ist->removeColumn(ui->tableWidget_ist->columnCount()-1);
+        ui->tableWidget_ist->removeColumn(ui->tableWidget_ist->columnCount()-1);
+    }
+
     // …á«¨ ­¥ ¢ë¡à ­® ª®«-¢® ¯¥à¥¬¥­­ëå ¨ â ¡«¨æ  ­¥ á®§¤ ­ 
     if (ui->radioButton_2vars->isChecked() == false && ui->radioButton_3vars->isChecked() == false && ui->radioButton_4vars->isChecked() == false)
     {
@@ -147,14 +163,6 @@ bool MainWindow::CheckCorrect(Ui::MainWindow *ui)
             return false;
         }
     }
-
-    // “„€‹…ˆ… ŠŽ‹ŽŽŠ Ž‘‹… ‘€ŒŽ„‚Ž‰‘’‚…Ž‘’ˆ
-//    if (b_SELFd == true)
-//    {
-//        b_SELFd = false;
-//        ui->tableWidget_ist->removeColumn(ui->tableWidget_ist->columnCount()-1);
-//        ui->tableWidget_ist->removeColumn(ui->tableWidget_ist->columnCount()-1);
-//    }
 
     return true;  // ãá¯¥å
 }
@@ -209,7 +217,7 @@ void MainWindow::on_pushButton_samo_clicked()
             // ®¬¥é ¥¬ ¢ ­®¢ãî ª®«®­ªã à¥§ã«ìâ â ®âà¨æ ­¨ï
             if (itm->text() == "1")
             {
-                origin.append(itm->text()); // § ¯¨á?¢ ¥¬ ¢¥ªâ®à ä-æ¨¨
+                origin.append(itm->text()); // § ¯¨áë¢ ¥¬ ¢¥ªâ®à ä-æ¨¨
                 QTableWidgetItem *zer0 = new QTableWidgetItem (QObject::tr("%1").arg(0));
                 ui->tableWidget_ist->setItem(i, columnC-1, zer0);
             }
@@ -333,7 +341,7 @@ void MainWindow::on_pushButton_SOP_clicked()
 
         SOP.remove( (SOP.length() - 4), 4 );    // ã¤ «ï¥¬ ¯®á«¥¤­¨© á¨¬¢®« ®¯¥à æ¨¨
 
-        ui->label_res->setText(SOP);        // ¢ë¢®¤
+        ui->label_res->setText(SOP);            // ¢ë¢®¤
     }
 }
 
