@@ -266,7 +266,7 @@ void MainWindow::on_pushButton_samo_clicked()
 }
 
 // ДДНФ
-void MainWindow::on_pushButton_SOP_clicked()
+void MainWindow::on_pushButton_SOP_clicked()        // константа нуля!!!
 {
     if ( CheckCorrect(ui) ) // проверка
     {
@@ -279,7 +279,7 @@ void MainWindow::on_pushButton_SOP_clicked()
         for (int i = 0; i < rows; i++)
         {
             QString for_anal = "";  // для интерпретаций
-            QTableWidgetItem *dnf = ui->tableWidget_ist->item(i, clmn );    // берем єлемент из последней колокни
+            QTableWidgetItem *dnf = ui->tableWidget_ist->item(i, clmn );    // берем елемент из последней колокни
             if (dnf->text() == "1") // Если единица
             {
                 // Цикл для записывания интерпретаций
@@ -289,63 +289,32 @@ void MainWindow::on_pushButton_SOP_clicked()
                     for_anal.append(interp->text());
                 }
 
-                // Выглядит ооооочень тупо. Но пока в голову ничего не приходит.
-                //****************************************************************ПРИШЛО: МОЖНО БРАТЬ ПЕРЕМЕННЫЕ КАК В ЖЕГАЛКИНЕ****************************************
-                // Как посмотреть всю интерпретацию и каждое число. Каждое число имеет два варианта. И в ответ разную букву помещать.
-                // Слабая универсальность прослеживается
-
-                // Условия анализа интерпретации и формирования результата
-                if (for_anal[0] == "1") // первая
+                for (int clmn = 0;  clmn < for_anal.size(); clmn++)
                 {
-                    SOP.append("X");
-                }
-                else if (for_anal[0] == "0")
-                {
-                    SOP.append("X'");
+                    QTableWidgetItem *var_h = ui->tableWidget_ist->horizontalHeaderItem(clmn);
+                    if (for_anal[clmn] == "1")
+                    {
+                        SOP.append(var_h->text());
+                    }
+                    else
+                    {
+                        SOP.append(var_h->text() + "'");
+                    }
                 }
 
-                if (for_anal[1] == "1") // вторая
-                {
-                    SOP.append("Y");
-                }
-                else if (for_anal[1] == "0")
-                {
-                    SOP.append("Y'");
-                }
-
-                if (rows > 2)
-                {
-                    if (for_anal[2] == "1") // третья
-                    {
-                        SOP.append("Z");
-                    }
-                    else if (for_anal[2] == "0")
-                    {
-                        SOP.append("Z'");
-                    }
-                }
-                if (rows > 3)           // четвертая
-                {
-                    if (for_anal[3] == "1")
-                    {
-                        SOP.append("T");
-                    }
-                    else if (for_anal[3] == "0")
-                    {
-                        SOP.append("T'");
-                    }
-                }
                 SOP.append(" || "); // дизюнкция конюнкций
             }
         }
 
         SOP.remove( (SOP.length() - 4), 4 );    // удаляем последний символ операции
 
-        ui->label_res->setText(SOP);            // вывод
+        ui->label_res->setText(SOP);            // вывод            **** СЛИШКОМ ДЛИННЫЙ, ЕСЛИ 4 ПЕРЕМЕННЫЕ ВСЕ ЕДИНИЦЫ
+
+        QMessageBox::information(this, "Result", SOP);              // ДОБАВИЛ МЕСЕДЖ-БОКС. было бы неплохо контролировать его размер в зависимости от SOP.size()
     }
 }
 
-// ДКНФ
+// ДКНФ         // константа 1
 
 
 // Жегалкин
