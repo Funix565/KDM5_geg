@@ -274,6 +274,7 @@ void MainWindow::on_pushButton_SOP_clicked()        // константа нуля!!!
         int clmn = ui->tableWidget_ist->columnCount() - 1;  // колонки, берем с индекса (ф-ция - 1)
 
         QString SOP = "Result:  ";  // строка результат
+        int const_zero = 0;
 
         // Цикл прохода по рядкам ТИ
         for (int i = 0; i < rows; i++)
@@ -304,6 +305,16 @@ void MainWindow::on_pushButton_SOP_clicked()        // константа нуля!!!
 
                 SOP.append(" || "); // дизюнкция конюнкций
             }
+            else
+            {
+                const_zero++;
+            }
+        }
+
+        if (const_zero == ui->tableWidget_ist->rowCount())
+        {
+            ui->label_res->setText("This function is constant of 0. SOP does not exist");
+            return;
         }
 
         SOP.remove( (SOP.length() - 4), 4 );    // удаляем последний символ операции
