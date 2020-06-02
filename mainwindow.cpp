@@ -385,6 +385,97 @@ void MainWindow::on_pushButton_POS_clicked()
     }
 }
 
+void MainWindow::on_pushButton_mono_clicked()
+{
+    if ( CheckCorrect(ui) )
+    {
+        int rows = ui->tableWidget_ist->rowCount();         // получаем рядки
+        int clmn = ui->tableWidget_ist->columnCount() - 1;  // колонки
+
+        std::vector<int> half1;
+        std::vector<int> half2;
+
+        QString f_half = "";
+        QString s_half = "";
+
+        for (int i = 0; i < rows; i++)
+        {
+            QTableWidgetItem *half = ui->tableWidget_ist->item(i, clmn);
+            bool ok;
+            int el = half->text().toInt(&ok, 2);
+
+            if (i < (rows / 2) )
+            {
+                f_half.append(half->text());
+            }
+            else
+            {
+                s_half.append(half->text());
+            }
+        }
+
+        QString str = s_half;
+        QString str2 = f_half;
+        QString before;
+        QString after;
+        int of = f_half.length() / 2;
+        while (f_half.size() > 1)
+        {
+            if (Sub_Eq(f_half, s_half) == false)
+            {
+                qDebug() << "not";
+                ui->label_res->setText("Is not monotonic");
+                return;
+            }
+            before = f_half.left(of);
+            after = f_half.mid(of);
+
+//            f_half = f_half.left(of);
+//            s_half = f_half.mid(of);
+
+            f_half = before;
+            s_half = after;
+            of -= 1;
+        }
+        of = s_half.length() / 2;
+        while (str.length() > 1)
+        {
+            if (Sub_Eq(str2, str) == false)
+            {
+                qDebug() << "not";
+                ui->label_res->setText("Is not monotonic");
+                return;
+            }
+            before = str.left(of);
+            after = str.mid(of);
+
+            str2 = before;
+            str = after;
+            of -= 1;
+        }
+
+        qDebug() << "monotonic";
+    }
+}
+
+bool MainWindow::Sub_Eq(QString &half1, QString &half2)
+{
+    bool ok;
+    int h1 = half1.toInt(&ok, 2);
+    int h2 = half2.toInt(&ok, 2);
+
+    if (h1 <= h2)
+    {
+
+        //half1 =
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 
 // Жегалкин
 void MainWindow::on_pushButton_Polinom_clicked()
@@ -476,5 +567,3 @@ std::vector<int> MainWindow::Calc_mod2(std::vector<int> line)
     }
     return for_ret;     // возвращаем
 }
-
-

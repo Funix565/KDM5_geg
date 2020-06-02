@@ -17,6 +17,7 @@ public:
 
     bool CheckCorrect(Ui::MainWindow *ui);
     std::vector<int> Calc_mod2 (std::vector <int> line);
+    bool Sub_Eq (QString &, QString &);
 
     ~MainWindow();
 
@@ -30,6 +31,7 @@ private slots:
     void on_pushButton_SOP_clicked();
     void on_pushButton_Polinom_clicked();
     void on_pushButton_POS_clicked();
+    void on_pushButton_mono_clicked();
 };
 
 #endif // MAINWINDOW_H
