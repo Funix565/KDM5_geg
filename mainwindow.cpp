@@ -87,12 +87,14 @@ void MainWindow::ChosenRadio()
             for (j = 0; j < zeros / 2; j++)
             {
                 QTableWidgetItem *zero = new QTableWidgetItem (QObject::tr("%1").arg(0));
+                zero->setFlags(Qt::ItemIsEnabled);
                 ui->tableWidget_ist->setItem(row, i, zero);
                 row++;
             }
             for ( ; j < zeros; j++)
             {
                 QTableWidgetItem *one = new QTableWidgetItem (QObject::tr("%1").arg(1));
+                one->setFlags(Qt::ItemIsEnabled);
                 ui->tableWidget_ist->setItem(row, i, one);
                 row++;
             }
@@ -102,29 +104,22 @@ void MainWindow::ChosenRadio()
         pov++;
     }
 
-    /* РАСПИШИ ТУТ, КАК НАДО. ЭТО КОД С ЛАБЫ ПО КАЛЬКУЛЯТОРУ
-     *
-     *
-    ui->tableWidget_tab->setEditTriggers(QAbstractItemView::NoEditTriggers);                            // блокировка ячеек
-    //ui->tableWidget_tab->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents); // блокировка для редактирования столбцов
-    //ui->tableWidget_tab->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);   // блокировка для редактирования рядов
-    ui->tableWidget_tab->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    ui->tableWidget_tab->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    int w = ui->tableWidget_tab->verticalHeader()->width() +4;                                      // считаем размер окна для таблицы (+4 нужно!)
-    for (int i = 0; i < ui->tableWidget_tab->columnCount(); i++)                                    // считаем ширину
+    ui->tableWidget_ist->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents); // блокировка для редактирования столбцов
+    ui->tableWidget_ist->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);   // блокировка для редактирования рядов
+    ui->tableWidget_ist->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->tableWidget_ist->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    int w = ui->tableWidget_ist->verticalHeader()->width() +4;                                      // считаем размер окна для таблицы (+4 нужно!)
+    for (int i = 0; i < ui->tableWidget_ist->columnCount(); i++)                                    // считаем ширину
     {
-        w += ui->tableWidget_tab->columnWidth(i);
+        w += ui->tableWidget_ist->columnWidth(i);
     }
-    int h = ui->tableWidget_tab->horizontalHeader()->height() + 4;
-    for (int i = 0; i < ui->tableWidget_tab->rowCount(); i++)                                       // считаем высоту
+    int h = ui->tableWidget_ist->horizontalHeader()->height() + 4;
+    for (int i = 0; i < ui->tableWidget_ist->rowCount(); i++)                                       // считаем высоту
     {
-        h += ui->tableWidget_tab->rowHeight(i);
+        h += ui->tableWidget_ist->rowHeight(i);
     }
     QSize p = QSize(w, h);
-    ui->tableWidget_tab->setFixedSize(p);                                                           // устанавливаем размер таблицы
-    *
-    *
-    * РАСПИШИ ТАМ, КАК НАДО. ЭТО КОД С ЛАБЫ ПО КАЛЬКУЛЯТОРУ */
+    ui->tableWidget_ist->setFixedSize(p);                                                           // устанавливаем размер таблицы
 }
 
 // Проверка таблицы
@@ -325,7 +320,70 @@ void MainWindow::on_pushButton_SOP_clicked()        // константа нуля!!!
     }
 }
 
-// ДКНФ         // константа 1
+// ДКНФ
+void MainWindow::on_pushButton_POS_clicked()
+{
+    if ( CheckCorrect(ui))      // проверка
+    {
+        int rows = ui->tableWidget_ist->rowCount();         // рядки
+        int clmn = ui->tableWidget_ist->columnCount() - 1;  // колонки, берем с индекса (ф-ция - 1)
+
+        QString POS = "Result:  ";  // строка результат
+        int const_one = 0;
+
+        for (int i = 0; i < rows; i++)
+        {
+            QString for_anal = "";
+            QTableWidgetItem *knf = ui->tableWidget_ist->item(i, clmn );    // берем елемент из последней колокни
+            if (knf->text() == "0")
+            {
+                // Цикл для записывания интерпретаций
+                for (int k = 0; k < clmn; k++)
+                {
+                    QTableWidgetItem *interp = ui->tableWidget_ist->item(i, k);
+                    for_anal.append(interp->text());
+                }
+
+                // Цикл анализа интерпретаций и формирования результата
+                for (int clmn = 0;  clmn < for_anal.size(); clmn++)
+                {
+                    QTableWidgetItem *var_h = ui->tableWidget_ist->horizontalHeaderItem(clmn);
+                    if (clmn == 0)
+                    {
+                        POS.append("(");    // перед первым элементом скобка
+                    }
+                    if (for_anal[clmn] == "1")
+                    {
+                        POS.append(var_h->text() + "'" + "\u2228");
+                    }
+                    else
+                    {
+                        POS.append(var_h->text() + "\u2228");
+                    }
+                    if (clmn == ui->tableWidget_ist->columnCount() - 2)
+                    {
+                        POS.remove( (POS.length() - 1), 1);     // удаляем символ дизъюнкции после последнего
+                        POS.append(")");                        // после последнего скобка
+                    }
+                }
+            }
+            else
+            {
+                const_one++; // считаем константу 1
+            }
+        }
+        // если единиц столько же, сколько и рядков
+        if (const_one == ui->tableWidget_ist->rowCount())
+        {
+            ui->label_res->setText("This function is constant of 1. POS does not exist");
+            return;
+        }
+
+        // вывод результата
+        ui->label_res->setText(POS);
+        QMessageBox::information(this, "Result", POS);
+    }
+}
 
 
 // Жегалкин
@@ -418,3 +476,5 @@ std::vector<int> MainWindow::Calc_mod2(std::vector<int> line)
     }
     return for_ret;     // возвращаем
 }
+
+

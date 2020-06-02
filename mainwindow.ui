@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>960</width>
-    <height>540</height>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -150,14 +150,14 @@ polynomial</string>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>480</y>
+      <y>590</y>
       <width>881</width>
       <height>30</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <pointsize>9</pointsize>
+      <pointsize>10</pointsize>
      </font>
     </property>
     <property name="text">

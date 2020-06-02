@@ -29,6 +29,7 @@ private slots:
     void on_pushButton_samo_clicked();
     void on_pushButton_SOP_clicked();
     void on_pushButton_Polinom_clicked();
+    void on_pushButton_POS_clicked();
 };
 
 #endif // MAINWINDOW_H
