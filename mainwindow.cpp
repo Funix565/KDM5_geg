@@ -25,14 +25,6 @@ MainWindow::~MainWindow()
 // Ф-ция построение таблицы
 void MainWindow::ChosenRadio()
 {
-    // УДАЛЕНИЕ КОЛОНОК ПОСЛЕ САМОДВОЙСТВЕННОСТИ
-    if (b_SELFd == true)
-    {
-        b_SELFd = false;
-        ui->tableWidget_ist->removeColumn(ui->tableWidget_ist->columnCount()-1);
-        ui->tableWidget_ist->removeColumn(ui->tableWidget_ist->columnCount()-1);
-    }
-
     ui->tableWidget_ist->clear();
 
     QRadioButton *rb = (QRadioButton *)sender();    // сигнал от кнопки
@@ -130,6 +122,19 @@ bool MainWindow::CheckCorrect(Ui::MainWindow *ui)
         b_SELFd = false;
         ui->tableWidget_ist->removeColumn(ui->tableWidget_ist->columnCount()-1);
         ui->tableWidget_ist->removeColumn(ui->tableWidget_ist->columnCount()-1);
+        // считаем размер размеры для таблицы без 2-х колонок
+        int w = ui->tableWidget_ist->verticalHeader()->width() +4;                                      // считаем размер окна для таблицы (+4 нужно!)
+        for (int i = 0; i < ui->tableWidget_ist->columnCount(); i++)                                    // считаем ширину
+        {
+            w += ui->tableWidget_ist->columnWidth(i);
+        }
+        int h = ui->tableWidget_ist->horizontalHeader()->height() + 4;
+        for (int i = 0; i < ui->tableWidget_ist->rowCount(); i++)                                       // считаем высоту
+        {
+            h += ui->tableWidget_ist->rowHeight(i);
+        }
+        QSize p = QSize(w, h);
+        ui->tableWidget_ist->setFixedSize(p);
     }
 
     // Если не выбрано кол-во переменных и таблица не создана
@@ -189,14 +194,13 @@ void MainWindow::on_pushButton_save01_clicked()
     }
 }
 
-// Самодвойственная?
+// Самодвойственная
 void MainWindow::on_pushButton_samo_clicked()
 {
     if ( CheckCorrect(ui) )  // проверка таблицы истинности
     {
         ui->tableWidget_ist->insertColumn(ui->tableWidget_ist->columnCount()); // вставляем колонку для НЕ
         ui->tableWidget_ist->setHorizontalHeaderItem(ui->tableWidget_ist->columnCount()-1, new QTableWidgetItem("F'"));
-
         // Строки исходной ф-ции и двойственной
         QString origin = "";
         QString dual ="";
@@ -222,11 +226,22 @@ void MainWindow::on_pushButton_samo_clicked()
                 ui->tableWidget_ist->setItem(i, columnC-1, one1);
             }
         }
-
         ui->tableWidget_ist->insertColumn(ui->tableWidget_ist->columnCount());      // вставляем колонку для двойственности
         ui->tableWidget_ist->setHorizontalHeaderItem(ui->tableWidget_ist->columnCount()-1, new QTableWidgetItem("F*"));
         columnC = ui->tableWidget_ist->columnCount();
-
+        // устанавливаем размер для таблицы
+        int w = ui->tableWidget_ist->verticalHeader()->width() +4;                                      // считаем размер окна для таблицы (+4 нужно!)
+        for (int i = 0; i < ui->tableWidget_ist->columnCount(); i++)                                    // считаем ширину
+        {
+            w += ui->tableWidget_ist->columnWidth(i);
+        }
+        int h = ui->tableWidget_ist->horizontalHeader()->height() + 4;
+        for (int i = 0; i < ui->tableWidget_ist->rowCount(); i++)                                       // считаем высоту
+        {
+            h += ui->tableWidget_ist->rowHeight(i);
+        }
+        QSize p = QSize(w, h);
+        ui->tableWidget_ist->setMinimumSize(p);
         // Цикл прохода по всем рядкам
         for (int i = 0; i < rowC; i++)
         {
@@ -375,7 +390,6 @@ void MainWindow::on_pushButton_POS_clicked()
             ui->label_res->setText("This function is constant of 1. POS does not exist");
             return;
         }
-
         // вывод результата
         QMessageBox::information(this, "Result", POS);
     }
