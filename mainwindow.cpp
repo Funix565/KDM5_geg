@@ -25,6 +25,11 @@ MainWindow::~MainWindow()
 // Ф-ция построение таблицы
 void MainWindow::ChosenRadio()
 {
+    if (b_SELFd == true) {
+        b_SELFd = false;
+        ui->tableWidget_ist->removeColumn(ui->tableWidget_ist->columnCount() -1);
+        ui->tableWidget_ist->removeColumn(ui->tableWidget_ist->columnCount() -1);
+    }
     ui->tableWidget_ist->clear();
 
     QRadioButton *rb = (QRadioButton *)sender();    // сигнал от кнопки
@@ -186,7 +191,7 @@ void MainWindow::on_pushButton_save01_clicked()
         {
             result.append("1-preserving");      // сохраняет 1
         }
-        if (zer0->text() != "0" && one1->text() != "1")         // Другое условие, это иф тупой
+        if (zer0->text() != "0" && one1->text() != "1")         // Другое условие
         {
             result.append("not 0-preserving or 1-preserving");  // ничего не сохраняет
         }
