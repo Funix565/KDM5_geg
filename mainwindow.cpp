@@ -3,7 +3,6 @@
 #include <cmath>
 #include <QMessageBox>
 #include <vector>
-#include <QDebug>
 
 bool b_SELFd = false;
 
@@ -261,7 +260,7 @@ void MainWindow::on_pushButton_samo_clicked()
 }
 
 // ДДНФ
-void MainWindow::on_pushButton_SOP_clicked()        // константа нуля!!!
+void MainWindow::on_pushButton_SOP_clicked()
 {
     if ( CheckCorrect(ui) ) // проверка
     {
@@ -314,9 +313,7 @@ void MainWindow::on_pushButton_SOP_clicked()        // константа нуля!!!
 
         SOP.remove( (SOP.length() - 4), 4 );    // удаляем последний символ операции
 
-        ui->label_res->setText(SOP);            // вывод            **** СЛИШКОМ ДЛИННЫЙ, ЕСЛИ 4 ПЕРЕМЕННЫЕ ВСЕ ЕДИНИЦЫ
-
-        QMessageBox::information(this, "Result", SOP);              // ДОБАВИЛ МЕСЕДЖ-БОКС. было бы неплохо контролировать его размер в зависимости от SOP.size()
+        QMessageBox::information(this, "Result", SOP);
     }
 }
 
@@ -380,104 +377,80 @@ void MainWindow::on_pushButton_POS_clicked()
         }
 
         // вывод результата
-        ui->label_res->setText(POS);
         QMessageBox::information(this, "Result", POS);
     }
 }
 
+// Проверка на монотонность
 void MainWindow::on_pushButton_mono_clicked()
 {
-    if ( CheckCorrect(ui) )
+    if ( CheckCorrect(ui) )     // проверка
     {
-        int rows = ui->tableWidget_ist->rowCount();         // получаем рядки
-        int clmn = ui->tableWidget_ist->columnCount() - 1;  // колонки
-
-        std::vector<int> half1;
-        std::vector<int> half2;
-
-        QString f_half = "";
-        QString s_half = "";
-
-        for (int i = 0; i < rows; i++)
+        int clmn = ui->tableWidget_ist->columnCount() - 1;              // последняя колонка с результатом функции
+        for (int j = 0; j < ui->tableWidget_ist->rowCount(); j++)       // цикл прохода во рядкам всей ТИ
         {
-            QTableWidgetItem *half = ui->tableWidget_ist->item(i, clmn);
-            bool ok;
-            int el = half->text().toInt(&ok, 2);
-
-            if (i < (rows / 2) )
+            QTableWidgetItem *mono = ui->tableWidget_ist->item(j, clmn);
+            if (mono->text() == "1")                                // если нашли 1
             {
-                f_half.append(half->text());
-            }
-            else
-            {
-                s_half.append(half->text());
+                QString orig = "";  // строка интерпертация
+                for (int k = 0; k < ui->tableWidget_ist->columnCount()-1; k++) // получаем интерпретацию, где 1
+                {
+                    QTableWidgetItem *test = ui->tableWidget_ist->item(j, k);
+                    orig.append(test->text());
+                }
+                for (int row_c = j + 1; row_c < ui->tableWidget_ist->rowCount(); row_c++)  // цикл прохода по всем строчкам после найденной 1
+                {
+                    QString comp = "";  // строка, с которой будем сравнивать
+                    for (int kol = 0; kol < ui->tableWidget_ist->columnCount() - 1; kol++)    // получаем интерепретацию
+                    {
+                        QTableWidgetItem *cmp = ui->tableWidget_ist->item(row_c, kol);
+                        comp.append(cmp->text());
+                    }
+                    // Если интерпретации сравнимы
+                    if ( Compare_Inter(orig, comp) == true)
+                    {
+                        QTableWidgetItem *cmp = ui->tableWidget_ist->item(row_c, clmn);
+                        // Сравниваем значение функций на этих интерпретациях
+                        if (mono->text() > cmp->text()) // если верхняя больше нижней
+                        {
+                            ui->label_res->setText("This function is not monotonic");   // не монотонная
+                            return;
+                        }
+                    }
+                }
             }
         }
 
-        QString str = s_half;
-        QString str2 = f_half;
-        QString before;
-        QString after;
-        int of = f_half.length() / 2;
-        while (f_half.size() > 1)
-        {
-            if (Sub_Eq(f_half, s_half) == false)
-            {
-                qDebug() << "not";
-                ui->label_res->setText("Is not monotonic");
-                return;
-            }
-            before = f_half.left(of);
-            after = f_half.mid(of);
-
-//            f_half = f_half.left(of);
-//            s_half = f_half.mid(of);
-
-            f_half = before;
-            s_half = after;
-            of -= 1;
-        }
-        of = s_half.length() / 2;
-        while (str.length() > 1)
-        {
-            if (Sub_Eq(str2, str) == false)
-            {
-                qDebug() << "not";
-                ui->label_res->setText("Is not monotonic");
-                return;
-            }
-            before = str.left(of);
-            after = str.mid(of);
-
-            str2 = before;
-            str = after;
-            of -= 1;
-        }
-
-        qDebug() << "monotonic";
+        // Если прошли все рядки и условие монотонности не нарушилось
+        ui->label_res->setText("This function is monotonic");   // Функция монотонная
     }
 }
 
-bool MainWindow::Sub_Eq(QString &half1, QString &half2)
+// Функция проверки: Сравнимы ли интерпретации
+bool MainWindow::Compare_Inter(QString orig, QString cmp)
 {
-    bool ok;
-    int h1 = half1.toInt(&ok, 2);
-    int h2 = half2.toInt(&ok, 2);
-
-    if (h1 <= h2)
+    int compare = 0;    // Счетчик сравнений.
+    // Каждое значение верхней интерпретации должно быть меньше равно каждому значению нижней интерпретации
+    // Цикл сравнения значний
+    for (int i = 0; i < orig.length(); i++)
     {
-
-        //half1 =
-        return true;
+        if ( orig[i] <= cmp[i] ) // условие выполняется
+        {
+            compare++;  // счетчик++
+        }
     }
-    else
+    // Если счетчик равен кол-ву элементов
+    if (compare == orig.length())
     {
-        return false;
+        return true;  // интерпретации сравнимы
+    }
+    else    // иначе
+    {
+        return false;   // не сравниваем
     }
 }
 
-
-// Жегалкин
+// Построение полинома Жегалкина
 void MainWindow::on_pushButton_Polinom_clicked()
 {
     if ( CheckCorrect(ui) ) // проверка

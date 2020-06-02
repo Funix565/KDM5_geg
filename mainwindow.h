@@ -17,7 +17,7 @@ public:
 
     bool CheckCorrect(Ui::MainWindow *ui);
     std::vector<int> Calc_mod2 (std::vector <int> line);
-    bool Sub_Eq (QString &, QString &);
+    bool Compare_Inter(QString, QString);
 
     ~MainWindow();
 
