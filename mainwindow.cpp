@@ -186,7 +186,7 @@ void MainWindow::on_pushButton_save01_clicked()
         {
             result.append("1-preserving");      // сохраняет 1
         }
-        if (zer0->text() != "0" && one1->text() != "1")         // Другое условие, это иф тупой
+        if (zer0->text() != "0" && one1->text() != "1")
         {
             result.append("not 0-preserving or 1-preserving");  // ничего не сохраняет
         }
